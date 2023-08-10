@@ -1,0 +1,24 @@
+DELIMITER //
+CREATE PROCEDURE BulkInsertStudents(IN student_names TEXT)
+BEGIN
+    DECLARE student_name VARCHAR(255);
+    DECLARE student_names_list TEXT DEFAULT student_names;
+    DECLARE delimiter_position INT;    
+    SET delimiter_position = INSTR(student_names_list, ',');
+    WHILE delimiter_position > 0 DO
+        SET student_name = TRIM(SUBSTRING(student_names_list, 1, delimiter_position - 1));
+        SET student_names_list = SUBSTRING(student_names_list, delimiter_position + 1);
+        INSERT INTO Students (student_name) VALUES (student_name);
+        SET delimiter_position = INSTR(student_names_list, ',');
+    END WHILE;
+    SET student_name = TRIM(student_names_list);
+    IF student_name <> '' THEN
+        INSERT INTO Students (student_name) VALUES (student_name);
+    END IF;
+    SELECT * FROM students;
+    SELECT 'Bulk insertion completed.' AS 'Message';
+END//
+DELIMITER ;
+
+
+CALL BulkInsertStudents('Saranya,Sruthi,Pavithra');
